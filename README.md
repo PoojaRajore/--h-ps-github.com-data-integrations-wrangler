@@ -48,3 +48,23 @@ public class ByteSize extends Token {
         }
     }
 }
+public class TimeDuration extends Token {
+    private final double duration;
+    private final String unit;
+
+    public TimeDuration(String value) {
+        super("TIME_DURATION", value);
+        this.unit = value.replaceAll("[\\d.]", "");
+        this.duration = Double.parseDouble(value.replaceAll("[^\\d.]", ""));
+    }
+
+    public long getMilliseconds() {
+        switch (unit) {
+            case "ms": return (long) duration;
+            case "s": return (long) (duration * 1000);
+            case "m": return (long) (duration * 60 * 1000);
+            case "h": return (long) (duration * 60 * 60 * 1000);
+            default: throw new IllegalArgumentException("Unknown unit: " + unit);
+        }
+    }
+}
