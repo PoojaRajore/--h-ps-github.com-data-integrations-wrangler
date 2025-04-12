@@ -77,3 +77,56 @@ public Token visitByteSizeValue(DirectivesParser.ByteSizeValueContext ctx) {
 public Token visitTimeDurationValue(DirectivesParser.TimeDurationValueContext ctx) {
     return new TimeDuration(ctx.getText());
 }
+@Directive(
+  name = "aggregate-stats",
+  description = "Aggregates byte size and time duration columns"
+)
+public class AggregateStats implements Directive {
+    private String byteColumn;
+    private String timeColumn;
+    private String outputByteColumn;
+    private String outputTimeColumn;
+
+    private long totalBytes = 0;
+    private long totalMillis = 0;
+    private int count = 0;
+
+    @Override
+    public UsageDefinition define() {
+        return UsageDefinition.builder()
+            .define("byteColumn", TokenType.COLUMN_NAME)
+            .define("timeColumn", TokenType.COLUMN_NAME)
+            .define("outputByteColumn", TokenType.COLUMN_NAME)
+            .define("outputTimeColumn", TokenType.COLUMN_NAME)
+            .build();
+    }
+
+    @Override
+    public void initialize(Arguments args) {
+        byteColumn = ((ColumnName) args.value("byteColumn")).value();
+        timeColumn = ((ColumnName) args.value("timeColumn")).value();
+        outputByteColumn = ((ColumnName) args.value("outputByteColumn")).value();
+        outputTimeColumn = ((ColumnName) args.value("outputTimeColumn")).value();
+    }
+
+    @Override
+    public List<Row> execute(List<Row> rows, ExecutorContext context) {
+        for (Row row : rows) {
+            ByteSize size = new ByteSize(row.getValue(byteColumn).toString());
+            TimeDuration time = new TimeDuration(row.getValue(timeColumn).toString());
+
+            totalBytes += size.getBytes();
+            totalMillis += time.getMilliseconds();
+            count++;
+        }
+
+        Row result = new Row();
+        result.add(outputByteColumn, totalBytes / (1024.0 * 1024.0)); // Convert to MB
+        result.add(outputTimeColumn, totalMillis / 1000.0); // Convert to seconds
+
+        return Collections.singletonList(result);
+    }
+
+    @Override
+    public void destroy() { }
+}
