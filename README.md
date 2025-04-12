@@ -68,3 +68,12 @@ public class TimeDuration extends Token {
         }
     }
 }
+@Override
+public Token visitByteSizeValue(DirectivesParser.ByteSizeValueContext ctx) {
+    return new ByteSize(ctx.getText());
+}
+
+@Override
+public Token visitTimeDurationValue(DirectivesParser.TimeDurationValueContext ctx) {
+    return new TimeDuration(ctx.getText());
+}
