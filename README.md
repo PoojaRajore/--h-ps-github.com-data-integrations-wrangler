@@ -27,3 +27,24 @@ public class ByteSize extends Token {
         }
     }
 }
+public class ByteSize extends Token {
+    private final double size;
+    private final String unit;
+
+    public ByteSize(String value) {
+        super("BYTE_SIZE", value);
+        this.unit = value.replaceAll("[\\d.]", "");
+        this.size = Double.parseDouble(value.replaceAll("[^\\d.]", ""));
+    }
+
+    public long getBytes() {
+        switch (unit.toUpperCase()) {
+            case "B": return (long) size;
+            case "KB": return (long) (size * 1024);
+            case "MB": return (long) (size * 1024 * 1024);
+            case "GB": return (long) (size * 1024 * 1024 * 1024);
+            case "TB": return (long) (size * 1024L * 1024 * 1024 * 1024);
+            default: throw new IllegalArgumentException("Unknown unit: " + unit);
+        }
+    }
+}
