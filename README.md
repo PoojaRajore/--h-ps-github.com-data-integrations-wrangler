@@ -130,3 +130,8 @@ public class AggregateStats implements Directive {
     @Override
     public void destroy() { }
 }
+@Test
+public void testByteSizeParsing() {
+    ByteSize size = new ByteSize("2.5MB");
+    Assert.assertEquals(2.5 * 1024 * 1024, size.getBytes(), 0.01);
+}
