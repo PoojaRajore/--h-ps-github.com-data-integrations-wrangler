@@ -151,3 +151,13 @@ public void testAggregateStatsDirective() throws Exception {
     Assert.assertEquals(3.0, result.get(0).getValue("total_size_mb"), 0.001);
     Assert.assertEquals(2.0, result.get(0).getValue("total_time_sec"), 0.001);
 }
+### ByteSize and TimeDuration Parsers
+
+Wrangler now supports native parsing of size and duration units:
+
+- **ByteSize** supports: `B`, `KB`, `MB`, `GB`, `TB`
+- **TimeDuration** supports: `ms`, `s`, `m`, `h`
+
+**Example Usage:**
+```wrangler
+aggregate-stats :data_transfer_size :response_time :total_size_mb :total_time_sec
