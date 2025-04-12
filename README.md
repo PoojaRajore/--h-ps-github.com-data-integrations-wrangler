@@ -135,3 +135,19 @@ public void testByteSizeParsing() {
     ByteSize size = new ByteSize("2.5MB");
     Assert.assertEquals(2.5 * 1024 * 1024, size.getBytes(), 0.01);
 }
+@Test
+public void testAggregateStatsDirective() throws Exception {
+    List<Row> rows = Arrays.asList(
+        new Row().add("data_transfer_size", "1MB").add("response_time", "500ms"),
+        new Row().add("data_transfer_size", "2MB").add("response_time", "1500ms")
+    );
+
+    String[] recipe = new String[] {
+        "aggregate-stats :data_transfer_size :response_time :total_size_mb :total_time_sec"
+    };
+
+    List<Row> result = TestingRig.execute(recipe, rows);
+    Assert.assertEquals(1, result.size());
+    Assert.assertEquals(3.0, result.get(0).getValue("total_size_mb"), 0.001);
+    Assert.assertEquals(2.0, result.get(0).getValue("total_time_sec"), 0.001);
+}
